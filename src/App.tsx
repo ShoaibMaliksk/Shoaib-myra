@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Mic, MicOff, Loader2, Volume2, VolumeX, Keyboard, Send, Trash2 } from "lucide-react";
+import { Mic, MicOff, Loader2, Volume2, VolumeX, Keyboard, Send, Trash2, Settings } from "lucide-react";
 import { getZoyaResponse, getZoyaAudio, resetZoyaSession } from "./services/geminiService";
 import { processCommand } from "./services/commandService";
 import { LiveSessionManager } from "./services/liveService";
 import Visualizer from "./components/Visualizer";
 import PermissionModal from "./components/PermissionModal";
+import SettingsModal from "./components/SettingsModal";
 import { playPCM } from "./utils/audioUtils";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -54,6 +55,7 @@ export default function App() {
   const [showTextInput, setShowTextInput] = useState(false);
   const [textInput, setTextInput] = useState("");
   const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [isSessionActive, setIsSessionActive] = useState(false);
 
   const liveSessionRef = useRef<LiveSessionManager | null>(null);
@@ -190,6 +192,13 @@ export default function App() {
         />
       )}
 
+      {showSettingsModal && (
+        <SettingsModal 
+          onClose={() => setShowSettingsModal(false)}
+          onSave={() => resetZoyaSession()}
+        />
+      )}
+
       {/* Cinematic Background Gradients */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-violet-900/20 blur-[120px] rounded-full" />
@@ -229,6 +238,13 @@ export default function App() {
             ) : (
               <Volume2 size={18} className="opacity-70" />
             )}
+          </button>
+          <button
+            onClick={() => setShowSettingsModal(true)}
+            className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
+            title="Gemini Settings"
+          >
+            <Settings size={18} className="opacity-70" />
           </button>
         </div>
       </header>

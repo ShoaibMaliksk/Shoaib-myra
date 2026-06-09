@@ -4,13 +4,18 @@ const systemInstruction = `Your name is Zoya. You are an Indian female AI assist
 
 let chatSession: any = null;
 
+export function getGeminiApiKey(): string {
+  const savedKey = typeof window !== "undefined" ? localStorage.getItem("zoya_gemini_api_key") : null;
+  return savedKey && savedKey.trim() ? savedKey.trim() : (process.env.GEMINI_API_KEY || "");
+}
+
 export function resetZoyaSession() {
   chatSession = null;
 }
 
 export async function getZoyaResponse(prompt: string, history: { sender: "user" | "zoya", text: string }[] = []): Promise<string> {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const ai = new GoogleGenAI({ apiKey: getGeminiApiKey() });
     
     if (!chatSession) {
       // SLIDING WINDOW MEMORY: Keep only the last 20 messages to prevent "buffer full" (context window overflow)
@@ -59,7 +64,7 @@ export async function getZoyaResponse(prompt: string, history: { sender: "user" 
 
 export async function getZoyaAudio(text: string): Promise<string | null> {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const ai = new GoogleGenAI({ apiKey: getGeminiApiKey() });
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-preview-tts",
       contents: [{ parts: [{ text }] }],
